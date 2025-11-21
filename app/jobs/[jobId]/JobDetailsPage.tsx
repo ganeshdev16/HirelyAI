@@ -9,6 +9,7 @@ import {
   Building,
   Bookmark,
 } from "lucide-react";
+import JobChatbot from "@/components/JobChatbot";
 
 interface JobDetail {
   jobId: number;
@@ -252,6 +253,9 @@ const JobDetailsPage = ({ jobId }: JobDetailsPageProps) => {
 
         {/* Job Details Summary */}
       </div>
+
+      {/* AI Chatbot */}
+      <JobChatbot job={job} />
     </div>
   );
 };

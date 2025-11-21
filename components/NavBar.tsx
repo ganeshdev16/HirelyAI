@@ -42,6 +42,14 @@ export default function NavBar() {
             </Link>
           </div>
         ))}
+        <div>
+          <Link
+            href="/admin/dashboard"
+            className={`${figtree.className} text-gray-400 hover:text-white transition-colors text-[16px] font-normal cursor-pointer`}
+          >
+            Admin Dashboard
+          </Link>
+        </div>
       </div>
 
       {/* Desktop Auth Buttons */}
@@ -90,13 +98,24 @@ export default function NavBar() {
           <div className="flex flex-col gap-6 mb-8">
             {NAVMENU.map((item) => (
               <div key={item.id} onClick={toggleMenu}>
+                <Link href={item.href}>
+                  <p
+                    className={`${figtree.className} text-white hover:text-white transition-colors text-[16px] font-normal cursor-pointer`}
+                  >
+                    {item.name}
+                  </p>
+                </Link>
+              </div>
+            ))}
+            <div onClick={toggleMenu}>
+              <Link href="/admin/dashboard">
                 <p
                   className={`${figtree.className} text-white hover:text-white transition-colors text-[16px] font-normal cursor-pointer`}
                 >
-                  {item.name}
+                  Admin Dashboard
                 </p>
-              </div>
-            ))}
+              </Link>
+            </div>
           </div>
 
           {/* Mobile Auth Buttons */}

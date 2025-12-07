@@ -5,13 +5,14 @@ import {
   Mail,
   Clock,
   MapPin,
-  Menu,
   X,
+  Menu,
   BriefcaseBusiness,
 } from "lucide-react";
 import { Figtree } from "next/font/google";
 import Footer from "@/components/Footer";
 import LogoStrip from "@/components/LogoStrip";
+import NavBar from "@/components/NavBar";
 
 const figtree = Figtree({ subsets: ["latin"] });
 

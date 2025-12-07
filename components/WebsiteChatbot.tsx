@@ -2,36 +2,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, Send, X, Loader2 } from "lucide-react";
 
-interface JobDetail {
-  jobId: number;
-  employerId: number;
-  employerName: string;
-  jobTitle: string;
-  locationName: string;
-  minimumSalary?: number;
-  maximumSalary?: number;
-  currency?: string;
-  expirationDate: string;
-  date: string;
-  jobDescription: string;
-  jobUrl: string;
-}
-
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
-interface JobChatbotProps {
-  job: JobDetail;
-}
-
-const JobChatbot = ({ job }: JobChatbotProps) => {
+const WebsiteChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: `Hi! I can help you understand this ${job.jobTitle} position at ${job.employerName}. Ask me about the role, location, salary, or responsibilities!`,
+      content:
+        "Hi! Welcome to HirelyAI! 👋 I'm here to help you learn about our platform. Ask me about our features, how to find jobs, save listings, or anything else!",
     },
   ]);
   const [input, setInput] = useState("");
@@ -39,7 +21,7 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
   const [showPopup, setShowPopup] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Popup animation - shows every 5 seconds
+  // Popup animation - shows every 2 seconds
   useEffect(() => {
     if (!isOpen) {
       const interval = setInterval(() => {
@@ -59,20 +41,6 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
     scrollToBottom();
   }, [messages]);
 
-  const formatSalary = (
-    min?: number,
-    max?: number,
-    currency = "GBP"
-  ): string => {
-    const symbol = currency === "GBP" ? "£" : "$";
-    if (min && max) {
-      return `${symbol}${min.toLocaleString()}-${symbol}${max.toLocaleString()}`;
-    } else if (min) {
-      return `${symbol}${min.toLocaleString()}+`;
-    }
-    return "Competitive";
-  };
-
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -82,29 +50,13 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
     setIsLoading(true);
 
     try {
-      // Prepare job details for context
-      const jobDetails = {
-        jobTitle: job.jobTitle,
-        employerName: job.employerName,
-        locationName: job.locationName,
-        salary: formatSalary(
-          job.minimumSalary,
-          job.maximumSalary,
-          job.currency
-        ),
-        jobDescription: job.jobDescription
-          .replace(/<[^>]*>/g, "")
-          .substring(0, 1000), // Strip HTML and limit length
-      };
-
-      const response = await fetch("/api/chatbot", {
+      const response = await fetch("/api/website-chatbot", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           message: userMessage,
-          jobDetails,
         }),
       });
 
@@ -139,10 +91,10 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
   };
 
   const quickQuestions = [
-    "What's the salary range?",
-    "Tell me about the location",
-    "Summarize the role",
-    "What are the key responsibilities?",
+    "How do I search for jobs?",
+    "How can I save jobs?",
+    "What features do you offer?",
+    "Tell me about HirelyAI",
   ];
 
   const handleQuickQuestion = (question: string) => {
@@ -158,7 +110,7 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
           {showPopup && (
             <div className="absolute bottom-20 right-0 mb-2 animate-bounce">
               <div className="bg-white text-gray-900 px-4 py-2 rounded-lg shadow-lg border border-teal-200 whitespace-nowrap">
-                <p className="text-sm font-medium">💬 Ask me about this job!</p>
+                <p className="text-sm font-medium">💬 Chat with our bot!</p>
               </div>
               {/* Arrow pointing to button */}
               <div className="absolute -bottom-2 right-6 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white"></div>
@@ -185,7 +137,7 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
           <div className="bg-teal-600 text-white p-4 rounded-t-lg flex justify-between items-center">
             <div className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5" />
-              <h3 className="font-semibold">Job Assistant</h3>
+              <h3 className="font-semibold">HirelyAI Assistant</h3>
             </div>
             <button
               onClick={() => setIsOpen(false)}
@@ -212,7 +164,7 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
                       : "bg-gray-100 text-gray-900"
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  <p className="text-sm whitespace-pre-line">{message.content}</p>
                 </div>
               </div>
             ))}
@@ -252,7 +204,7 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask about this job..."
+                placeholder="Ask about HirelyAI..."
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-600 text-sm"
                 disabled={isLoading}
               />
@@ -272,4 +224,4 @@ const JobChatbot = ({ job }: JobChatbotProps) => {
   );
 };
 
-export default JobChatbot;
+export default WebsiteChatbot;

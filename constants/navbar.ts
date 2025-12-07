@@ -11,11 +11,16 @@ export const NAVMENU = [
   },
   {
     id: 3,
+    name: "Saved Jobs",
+    href: "/saved-jobs",
+  },
+  {
+    id: 4,
     name: "About Us",
     href: "/contact",
   },
   {
-    id: 4,
+    id: 5,
     name: "Contact Us",
     href: "/contact",
   },

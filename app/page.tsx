@@ -6,6 +6,7 @@ import JobSearchComponent from "@/components/JobSearchComponent";
 import LogoStrip from "@/components/LogoStrip";
 import NavBar from "@/components/NavBar";
 import TestimonialsSection from "@/components/TestimonialsSection";
+import WebsiteChatbot from "@/components/WebsiteChatbot";
 import { Figtree } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,6 +53,9 @@ export default function Home() {
         <TestimonialsSection />
         <Footer />
       </div>
+
+      {/* Website Chatbot */}
+      <WebsiteChatbot />
     </div>
   );
 }

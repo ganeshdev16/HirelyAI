@@ -24,6 +24,9 @@ import {
 } from "lucide-react";
 import { log } from "console";
 import Link from "next/link";
+import { saveJob, unsaveJob, isJobSaved, getSavedJobs } from "@/utils/savedJobs";
+import { useAuth } from "@/context/authContext";
+import { useRouter } from "next/navigation";
 
 const figtree = Figtree({ subsets: ["latin"] });
 
@@ -62,6 +65,9 @@ const JobBoard = ({ category }: JobBoardProps) => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [savedJobIds, setSavedJobIds] = useState<Set<number>>(new Set());
+  const { authState } = useAuth();
+  const router = useRouter();
 
   // Decode the category from URL encoding and provide a default
   const decodedCategory = decodeURIComponent(category);
@@ -162,6 +168,61 @@ const JobBoard = ({ category }: JobBoardProps) => {
       return `${symbol}${min.toLocaleString()}+`;
     }
     return "Competitive";
+  };
+
+  // Load saved job IDs when component mounts
+  useEffect(() => {
+    const loadSavedJobs = async () => {
+      if (authState.isAuthenticated) {
+        const saved = await getSavedJobs();
+        setSavedJobIds(new Set(saved.map((job) => job.jobId)));
+      }
+    };
+    loadSavedJobs();
+  }, [authState.isAuthenticated]);
+
+  // Handle save/unsave job
+  const handleToggleSaveJob = async (job: Job) => {
+    // Check if user is logged in
+    if (!authState.isAuthenticated) {
+      alert("Please login to save jobs");
+      router.push("/sign-in");
+      return;
+    }
+
+    const isSaved = savedJobIds.has(job.jobId);
+
+    if (isSaved) {
+      const success = await unsaveJob(job.jobId);
+      if (success) {
+        setSavedJobIds((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(job.jobId);
+          return newSet;
+        });
+      }
+    } else {
+      const success = await saveJob({
+        jobId: job.jobId,
+        employerId: job.employerId,
+        employerName: job.employerName,
+        jobTitle: job.jobTitle,
+        locationName: job.locationName,
+        minimumSalary: job.minimumSalary,
+        maximumSalary: job.maximumSalary,
+        currency: job.currency,
+        expirationDate: job.expirationDate,
+        date: job.date,
+        jobDescription: job.jobDescription,
+        jobUrl: job.jobUrl,
+      });
+
+      if (success) {
+        setSavedJobIds((prev) => new Set(prev).add(job.jobId));
+      } else {
+        alert("Failed to save job. Please try again.");
+      }
+    }
   };
 
   // Fetch jobs when component mounts or when category/search parameters change
@@ -390,7 +451,14 @@ const JobBoard = ({ category }: JobBoardProps) => {
                           <span className="text-xs text-gray-500">
                             {getTimeAgo(job.date)}
                           </span>
-                          <Bookmark className="w-5 h-5 text-gray-400 cursor-pointer hover:text-teal-600 transition-colors" />
+                          <Bookmark
+                            className={`w-5 h-5 cursor-pointer transition-colors ${
+                              savedJobIds.has(job.jobId)
+                                ? "text-teal-600 fill-teal-600"
+                                : "text-gray-400 hover:text-teal-600"
+                            }`}
+                            onClick={() => handleToggleSaveJob(job)}
+                          />
                         </div>
                       </div>
 

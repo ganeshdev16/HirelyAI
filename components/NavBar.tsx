@@ -1,6 +1,6 @@
 "use client";
 import { NAVMENU } from "@/constants/navbar";
-import { BriefcaseBusiness, Menu, X } from "lucide-react";
+import { BriefcaseBusiness, Menu, X, Bookmark } from "lucide-react";
 import { Figtree } from "next/font/google";
 import { useState } from "react";
 import CustomButton from "./CustomButton";
@@ -25,7 +25,7 @@ export default function NavBar() {
         <h2
           className={`text-[16px] sm:text-[20px] ${figtree.className} font-semibold text-white`}
         >
-          <span className="hidden sm:inline">Career Connect</span>
+          <span className="hidden sm:inline">HirelyAI</span>
           <span className="sm:hidden">CC</span>
         </h2>
       </div>
@@ -36,8 +36,11 @@ export default function NavBar() {
           <div key={item.id}>
             <Link
               href={item.href}
-              className={`${figtree.className} text-gray-400 hover:text-white transition-colors text-[16px] font-normal cursor-pointer`}
+              className={`${figtree.className} text-gray-400 hover:text-white transition-colors text-[16px] font-normal cursor-pointer flex items-center gap-2`}
             >
+              {item.name === "Saved Jobs" && (
+                <Bookmark className="w-4 h-4" />
+              )}
               {item.name}
             </Link>
           </div>
@@ -100,8 +103,11 @@ export default function NavBar() {
               <div key={item.id} onClick={toggleMenu}>
                 <Link href={item.href}>
                   <p
-                    className={`${figtree.className} text-white hover:text-white transition-colors text-[16px] font-normal cursor-pointer`}
+                    className={`${figtree.className} text-white hover:text-white transition-colors text-[16px] font-normal cursor-pointer flex items-center gap-2`}
                   >
+                    {item.name === "Saved Jobs" && (
+                      <Bookmark className="w-4 h-4" />
+                    )}
                     {item.name}
                   </p>
                 </Link>

@@ -1,6 +1,7 @@
 import Footer from "@/components/Footer";
 import JobBoard from "@/components/JobBoard";
 import JobSearchComponent from "@/components/JobSearchComponent";
+import NavBar from "@/components/NavBar";
 
 interface PageProps {
   params: {
@@ -12,6 +13,9 @@ export default function Page({ params }: PageProps) {
   console.log("Job page accessed with ID:", params.jobId);
   return (
     <>
+      <div className="bg-black">
+        <NavBar />
+      </div>
       <JobSearchComponent />
       <Footer />
     </>

@@ -10,6 +10,9 @@ import {
   Bookmark,
 } from "lucide-react";
 import JobChatbot from "@/components/JobChatbot";
+import { saveJob, unsaveJob, isJobSaved } from "@/utils/savedJobs";
+import { useAuth } from "@/context/authContext";
+import { useRouter } from "next/navigation";
 
 interface JobDetail {
   jobId: number;
@@ -34,6 +37,9 @@ const JobDetailsPage = ({ jobId }: JobDetailsPageProps) => {
   const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const { authState } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     console.log("JobDetailsPage mounted with ID:", jobId);
@@ -62,6 +68,12 @@ const JobDetailsPage = ({ jobId }: JobDetailsPageProps) => {
         const data = await response.json();
         console.log("Job details received:", data);
         setJob(data);
+
+        // Check if job is saved (only if user is authenticated)
+        if (authState.isAuthenticated) {
+          const saved = await isJobSaved(data.jobId);
+          setIsSaved(saved);
+        }
       } catch (err) {
         console.error("Error fetching job details:", err);
         setError(
@@ -73,7 +85,46 @@ const JobDetailsPage = ({ jobId }: JobDetailsPageProps) => {
     };
 
     fetchJobDetails();
-  }, [jobId]);
+  }, [jobId, authState.isAuthenticated]);
+
+  const handleToggleSaveJob = async () => {
+    if (!job) return;
+
+    // Check if user is logged in
+    if (!authState.isAuthenticated) {
+      alert("Please login to save jobs");
+      router.push("/sign-in");
+      return;
+    }
+
+    if (isSaved) {
+      const success = await unsaveJob(job.jobId);
+      if (success) {
+        setIsSaved(false);
+      }
+    } else {
+      const success = await saveJob({
+        jobId: job.jobId,
+        employerId: job.employerId,
+        employerName: job.employerName,
+        jobTitle: job.jobTitle,
+        locationName: job.locationName,
+        minimumSalary: job.minimumSalary,
+        maximumSalary: job.maximumSalary,
+        currency: job.currency,
+        expirationDate: job.expirationDate,
+        date: job.date,
+        jobDescription: job.jobDescription,
+        jobUrl: job.jobUrl,
+      });
+
+      if (success) {
+        setIsSaved(true);
+      } else {
+        alert("Failed to save job. Please try again.");
+      }
+    }
+  };
 
   const formatSalary = (
     min?: number,
@@ -197,7 +248,14 @@ const JobDetailsPage = ({ jobId }: JobDetailsPageProps) => {
               <span className="text-sm text-gray-500">
                 {getTimeAgo(job.date)}
               </span>
-              <Bookmark className="w-6 h-6 text-gray-400 cursor-pointer hover:text-teal-600 transition-colors" />
+              <Bookmark
+                className={`w-6 h-6 cursor-pointer transition-colors ${
+                  isSaved
+                    ? "text-teal-600 fill-teal-600"
+                    : "text-gray-400 hover:text-teal-600"
+                }`}
+                onClick={handleToggleSaveJob}
+              />
             </div>
           </div>
 
@@ -245,8 +303,15 @@ const JobDetailsPage = ({ jobId }: JobDetailsPageProps) => {
             >
               Apply Now
             </a>
-            <button className="px-6 py-3 border border-teal-600 text-teal-600 rounded-md hover:bg-teal-50 transition-colors font-medium">
-              Save Job
+            <button
+              onClick={handleToggleSaveJob}
+              className={`px-6 py-3 border rounded-md transition-colors font-medium ${
+                isSaved
+                  ? "border-teal-600 bg-teal-600 text-white hover:bg-teal-700"
+                  : "border-teal-600 text-teal-600 hover:bg-teal-50"
+              }`}
+            >
+              {isSaved ? "Saved ✓" : "Save Job"}
             </button>
           </div>
         </div>

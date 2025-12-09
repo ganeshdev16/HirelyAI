@@ -3,7 +3,7 @@ import { getAdminAuth } from '@/lib/firebaseAdmin';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { uid: string } }
+  { params }: { params: Promise<{ uid: string }> }
 ) {
   try {
     const adminAuth = getAdminAuth();
@@ -20,7 +20,7 @@ export async function DELETE(
       );
     }
 
-    const { uid } = params;
+    const { uid } = await params;
 
     // Validate UID
     if (!uid) {
